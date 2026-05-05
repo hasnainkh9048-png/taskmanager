@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Task Manager | Muhammad Hasnain</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 1.8rem;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+        
+        /* Add Task Form */
+        .add-task-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        #taskInput, #pendingReason, #prioritySelect {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        #addBtn {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        #addBtn:hover {
+            background: #5a67d8;
+            transform: scale(1.01);
+        }
+        
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            flex: 1;
+            padding: 10px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        /* Task Cards */
+        .task-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .task-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .task-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .task-title.completed {
+            text-decoration: line-through;
+            color: #999;
+        }
+        
+        .priority-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .priority-high {
+            background: #ff4757;
+            color: white;
+        }
+        
+        .priority-medium {
+            background: #ffa502;
+            color: white;
+        }
+        
+        .priority-low {
+            background: #2ed573;
+            color: white;
+        }
+        
+        .task-dates {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 12px 0;
+            font-size: 0.85rem;
+        }
+        
+        .date-item {
+            margin: 5px 0;
+            color: #666;
+        }
+        
+        .date-label {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .pending-reason {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .pending-reason strong {
+            color: #856404;
+        }
+        
+        .task-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        
+        .complete-btn {
+            background: #2ed573;
+            color: white;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .delete-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .edit-reason-btn {
+            background: #ffa502;
+            color: white;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        /* Stats */
+        .stats {
+            text-align: center;
+            margin-top: 25px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+            color: #999;
+        }
+        
+        footer .name {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .task-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Advanced Task Manager</h1>
+        <div class="subtitle">Track tasks with reasons, dates & priorities</div>
+        
+        <!-- Add Task Section -->
+        <div class="add-task-section">
+            <div class="form-group">
+                <label>📝 Task Title *</label>
+                <input type="text" id="taskInput" placeholder="Enter task...">
+            </div>
+            
+            <div class="form-group">
+                <label>⚠️ Why is this task pending? (Reason)</label>
+                <input type="text" id="pendingReason" placeholder="e.g., Waiting for client feedback, Need more time, Resource not available...">
+            </div>
+            
+            <div class="form-group">
+                <label>⚡ Priority</label>
+                <select id="prioritySelect">
+                    <option value="high">🔴 High Priority</option>
+                    <option value="medium">🟡 Medium Priority</option>
+                    <option value="low">🟢 Low Priority</option>
+                </select>
+            </div>
+            
+            <button id="addBtn">+ Add Task</button>
+        </div>
+        
+        <!-- Filters -->
+        <div class="filters">
+            <button class="filter-btn active" data-filter="all">📋 All Tasks</button>
+            <button class="filter-btn" data-filter="pending">⏳ Pending</button>
+            <button class="filter-btn" data-filter="completed">✅ Completed</button>
+        </div>
+        
+        <!-- Task List -->
+        <div id="taskList"></div>
+        
+        <!-- Stats -->
+        <div class="stats" id="stats"></div>
+        
+        <!-- Footer -->
+        <footer>
+            Developed with ❤️ by <span class="name">Muhammad Hasnain</span> | Complete Task Management System
+        </footer>
+    </div>
+    
+    <script>
+        let tasks = [];
+        let currentFilter = 'all';
+        
+        function loadTasks() {
+            const savedTasks = localStorage.getItem('hasnain_advanced_tasks');
+            if (savedTasks) {
+                tasks = JSON.parse(savedTasks);
+            }
+            renderTasks();
+        }
+        
+        function saveTasks() {
+            localStorage.setItem('hasnain_advanced_tasks', JSON.stringify(tasks));
+        }
+        
+        function addTask() {
+            const taskText = document.getElementById('taskInput').value.trim();
+            const pendingReason = document.getElementById('pendingReason').value.trim();
+            const priority = document.getElementById('prioritySelect').value;
+            
+            if (taskText === '') {
+                alert('Please enter a task!');
+                return;
+            }
+            
+            const newTask = {
+                id: Date.now(),
+                text: taskText,
+                pendingReason: pendingReason || 'No reason provided',
+                priority: priority,
+                completed: false,
+                createdAt: new Date().toLocaleString(),
+                completedAt: null
+            };
+            
+            tasks.push(newTask);
+            saveTasks();
+            renderTasks();
+            
+            // Clear form
+            document.getElementById('taskInput').value = '';
+            document.getElementById('pendingReason').value = '';
+            document.getElementById('prioritySelect').value = 'medium';
+        }
+        
+        function toggleComplete(id) {
+            const task = tasks.find(t => t.id === id);
+            if (!task.completed) {
+                task.completed = true;
+                task.completedAt = new Date().toLocaleString();
+            } else {
+                task.completed = false;
+                task.completedAt = null;
+            }
+            saveTasks();
+            renderTasks();
+        }
+        
+        function deleteTask(id) {
+            if (confirm('Are you sure you want to delete this task?')) {
+                tasks = tasks.filter(t => t.id !== id);
+                saveTasks();
+                renderTasks();
+            }
+        }
+        
+        function editReason(id) {
+            const task = tasks.find(t => t.id === id);
+            const newReason = prompt('Update the reason for this task:', task.pendingReason);
+            if (newReason !== null && newReason.trim() !== '') {
+                task.pendingReason = newReason.trim();
+                saveTasks();
+                renderTasks();
+            }
+        }
+        
+        function getPriorityColor(priority) {
+            switch(priority) {
+                case 'high': return 'priority-high';
+                case 'medium': return 'priority-medium';
+                case 'low': return 'priority-low';
+                default: return 'priority-medium';
+            }
+        }
+        
+        function getPriorityText(priority) {
+            switch(priority) {
+                case 'high': return '🔴 High';
+                case 'medium': return '🟡 Medium';
+                case 'low': return '🟢 Low';
+                default: return '🟡 Medium';
+            }
+        }
+        
+        function renderTasks() {
+            let filteredTasks = tasks;
+            
+            if (currentFilter === 'pending') {
+                filteredTasks = tasks.filter(t => !t.completed);
+            } else if (currentFilter === 'completed') {
+                filteredTasks = tasks.filter(t => t.completed);
+            }
+            
+            const taskList = document.getElementById('taskList');
+            
+            if (filteredTasks.length === 0) {
+                taskList.innerHTML = `
+                    <div style="text-align:center;padding:40px;color:#999;">
+                        📭 No tasks found. Add a new task above!
+                    </div>
+                `;
+            } else {
+                taskList.innerHTML = filteredTasks.map(task => `
+                    <div class="task-card">
+                        <div class="task-header">
+                            <div class="task-title ${task.completed ? 'completed' : ''}" onclick="toggleComplete(${task.id})">
+                                ${task.text}
+                                <span class="priority-badge ${getPriorityColor(task.priority)}">
+                                    ${getPriorityText(task.priority)}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="task-dates">
+                            <div class="date-item">
+                                <span class="date-label">📅 Created:</span> ${task.createdAt}
+                            </div>
+                            ${task.completed ? `
+                                <div class="date-item">
+                                    <span class="date-label">✅ Completed:</span> ${task.completedAt}
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        ${!task.completed ? `
+                            <div class="pending-reason">
+                                <strong>⚠️ Why is this task pending?</strong><br>
+                                ${task.pendingReason}
+                            </div>
+                        ` : `
+                            <div class="pending-reason" style="background:#d4edda;border-left-color:#28a745;">
+                                <strong>✅ Task Completed!</strong><br>
+                                Reason is no longer applicable.
+                            </div>
+                        `}
+                        
+                        <div class="task-actions">
+                            ${!task.completed ? `
+                                <button class="complete-btn" onclick="toggleComplete(${task.id})">✅ Mark Complete</button>
+                                <button class="edit-reason-btn" onclick="editReason(${task.id})">✏️ Edit Reason</button>
+                            ` : `
+                                <button class="complete-btn" onclick="toggleComplete(${task.id})">↩️ Reopen Task</button>
+                            `}
+                            <button class="delete-btn" onclick="deleteTask(${task.id})">🗑️ Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            // Update statistics
+            const total = tasks.length;
+            const completed = tasks.filter(t => t.completed).length;
+            const pending = total - completed;
+            const highPriority = tasks.filter(t => t.priority === 'high' && !t.completed).length;
+            
+            document.getElementById('stats').innerHTML = `
+                📊 Total: ${total} | ✅ Completed: ${completed} | ⏳ Pending: ${pending} | 🔴 High Priority Pending: ${highPriority}
+            `;
+        }
+        
+        // Event Listeners
+        document.getElementById('addBtn').addEventListener('click', addTask);
+        document.getElementById('taskInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addTask();
+        });
+        
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                renderTasks();
+            });
+        });
+        
+        // Initialize
+        loadTasks();
+    </script>
+</body>
+</html>
